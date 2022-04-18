@@ -1,0 +1,18 @@
+
+    primary-image         cf1:\timos\cpm.tim
+    primary-config        cf1:\config.cfg
+    address               {{ node.mgmt_ip }}/{{ common.mgmt_ip_prefix }}
+    primary-dns           {{ common.dns_server_1 }}
+    secondary-dns         {{ common.dns_server_2 }}
+    dns-domain            {{ common.dns_domain }}
+    static-route          0.0.0.0/1 next-hop {{ common.mgmt_gateway }}
+    static-route          128.0.0.0/1 next-hop {{ common.mgmt_gateway }}
+    autonegotiate
+    duplex                full
+    speed                 100
+    wait                  3
+    persist               {{ common.bof_persist }}
+    no li-local-save
+    no li-separate
+    no fips-140-2
+    console-speed         115200
