@@ -1,5 +1,3 @@
-# nuage-sros-provisioning
+# SROS-provisioning
 
-Simple tool that allows to generate, upload and apply configuration files on Nuage SR-OS based nodes.
-
-Script developed for Python3
+Script allows you to generate, upload and apply configuration files for SR-OS based routes.
