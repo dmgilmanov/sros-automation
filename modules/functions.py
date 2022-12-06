@@ -44,7 +44,7 @@ def config_upload(deployment='default'):
         else:
             file_system = 'cf3:'
         print('Pushing configuration files to {}'.format(node))
-        with ConnectHandler(host=ip_addr,username='admin',password='Xm<YW4KnD54#&J>L',device_type='nokia_sros') as device:
+        with ConnectHandler(host=ip_addr,port='34002',username='admin',password='admin',device_type='nokia_sros') as device:
             with FileTransfer(device,source_file=node_path + '/bof.cfg', dest_file='bof.cfg',file_system=file_system,direction='put') as scp_transfer:
                 scp_transfer.transfer_file()
             with FileTransfer(device,source_file=node_path + '/config.cfg', dest_file='config.cfg',file_system=file_system,direction='put') as scp_transfer:
@@ -56,6 +56,6 @@ def node_reboot(deployment='default'):
     for node in nodes.keys():
         ip_addr = nodes[node]['mgmt_ip']
         print('Rebooting {}'.format(node))
-        with ConnectHandler(host=ip_addr,username='admin',password='Xm<YW4KnD54#&J>L',device_type='nokia_sros') as device:
+        with ConnectHandler(host=ip_addr,port='34002',username='admin',password='admin',device_type='nokia_sros') as device:
             device.send_command_timing('admin reboot now')
 

@@ -1,4 +1,3 @@
-
 exit all
 configure
 #--------------------------------------------------
@@ -7,7 +6,6 @@ echo "System Configuration"
     system
         name "{{ node.system_name }}"
         location "{{ common.system_location }}"
-        config-backup 9
         time
             ntp
                 no shutdown
@@ -15,310 +13,100 @@ echo "System Configuration"
             sntp
                 shutdown
             exit
-            zone {{ common.time_zone }}
         exit
     exit
 #--------------------------------------------------
 echo "System Security Configuration"
 #--------------------------------------------------
-    system
-        security
-            profile "backup"
-                default-action deny-all
-                entry 10
-                    match "bof save"
-                    action permit
-                exit                  
-                entry 20
-                    match "admin save"
-                    action permit
-                exit
-                entry 30
-                    match "file dir"
-                    action permit
-                exit
-            exit
-            profile "view-only"
-                default-action deny-all
-                entry 10
-                    match "show"
-                    action permit
-                exit
-                entry 20
-                    match "environment"
-                    action permit
-                exit
-                entry 30
-                    match "admin display-config"
-                    action permit
-                exit
-                entry 40
-                    match "monitor"
-                    action permit
-                exit
-                entry 50
-                    match "ssh"
-                    action permit
-                exit
-                entry 70
-                    match "clear"
-                    action permit
-                exit
-                entry 80
-                    match "ping"
-                    action permit
-                exit
-                entry 90
-                    match "traceroute"
-                    action permit
-                exit
-                entry 100
-                    description "permit oam ping "
-                    match "oam"
-                    action permit
-                exit
-                entry 110
-                    description "permit exit"
-                    match "exit"
-                    action permit
-                exit
-            exit
-            password
-                attempts 10 time 30 lockout 30
-                complexity-rules
-                    minimum-classes 4
-                    minimum-length 9
-                    required lowercase 1 uppercase 1 numeric 1 special-character 1
-                exit
-            exit
-            user "admin"
-                password "$2y$10$MtYuKWffZBNLbbM8oZQss.X.W.jDsUUVXyHYNG8sR.REIG8hVJTKe"
-                access console
-                console
-                    member "administrative"
-                exit
-            exit                      
-            user "backup"
-                password "$2y$10$ivnWb1rjV9wgUUBNmxNqI.MX85YtWILPtJXohx3kkAtZEbXh7Jgda"
-                access console
-                console
-                    member "default"
-                    member "backup"
-                exit
-            exit
-            snmp
-                community "P8j4AAdho/q3VWIR8MadHLO4qGJtHBxIfbRJow==" hash2 r version v2c
-            exit
-            ssh
-                preserve-key
-            exit
-            dist-cpu-protection
-                policy "_default-access-policy" create
-                exit
-                policy "_default-network-policy" create
-                exit
-            exit
-            vprn-network-exceptions
-        exit
-    exit
 #--------------------------------------------------
 echo "System Login Control Configuration"
 #--------------------------------------------------
-    system
-        login-control
-            ssh
-                inbound-max-sessions 50
-            exit
-            idle-timeout 15
-            pre-login-message "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n*                     THIS IS A PRIVATE NETWORK NODE                *\n*                                                                   *\n*    UNAUTHORISED ACCESS OF THIS NODE IS AN OFFENCE PURSUANT        *\n*                 TO THE COMPUTER MISUSE ACT 1990                   *\n*                                                                   *\n*   If you are not authorised to continue, disconnect your secure   *\n*                    remote session immediately.                    *\n*                                                                   *\n*       Only if you are authorised to continue should you do so.    *\n*                          You are being logged!                    *\n* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *"
-            no login-banner
-            exponential-backoff
-        exit
-    exit
 #--------------------------------------------------
 echo "Log Configuration"
 #--------------------------------------------------
-    log
-        route-preference primary outband secondary none
-        event-control "chassis" 2058 generate
-        event-control "chassis" 2059 generate
-        event-control "chassis" 2063 generate
-        event-control "chassis" 2076 generate
-        event-control "chassis" 2098 generate
-        event-control "chassis" 2099 generate
-        event-control "chassis" 2101 generate
-        event-control "chassis" 2102 generate
-        event-control "chassis" 2103 generate
-        event-control "chassis" 2110 generate
-        syslog 5
-            description "{{ common.syslog_name_1 }}"
-            address {{ common.syslog_vip_1 }}
-            level debug
-            log-prefix "{{ node.system_name }}"
-            port 5555
-        exit
-        syslog 6
-            description "{{ common.syslog_name_2 }}"
-            address {{ common.syslog_vip_2 }}
-            level debug
-            log-prefix "{{ node.system_name }}"
-            port 5555
-        exit
-        snmp-trap-group 88
-            description "Zabbix"
-            trap-target "{{ common.zabbix_name }}" address {{ common.zabbix_vip }} snmpv2c notify-community "t3lc0MMunity"
-        exit
-        log-id 5
-            description "{{ common.syslog_name_1 }}"
-            time-format local
-            from main security change debug-trace
-            to syslog 5
-            no shutdown
-        exit
-        log-id 6
-            description "{{ common.syslog_name_2 }}"
-            time-format local
-            from main security change debug-trace
-            to syslog 6
-            no shutdown
-        exit
-        log-id 88
-            description "Zabbix"
-            from main security change
-            to snmp 1024
-            no shutdown
-        exit
-    exit
 #--------------------------------------------------
 echo "Filter Log Configuration"
 #--------------------------------------------------
-    filter
-        log 101 create
-            destination memory 50000
-        exit
-    exit
 #--------------------------------------------------
 echo "Card Configuration"
 #--------------------------------------------------
     card 1
-        card-type iom-v
+        card-type xcm-1s
         mda 1
-            mda-type m20-v
+            mda-type s18-100gb-qsfp28
             no shutdown
         exit
         no shutdown
     exit
 #--------------------------------------------------
+echo "Connector Configuration"
+#--------------------------------------------------
+    port 1/1/c1
+        shutdown
+        connector
+            breakout c1-10g
+        exit
+        no shutdown
+        exit
+    port 1/1/c2
+        shutdown
+        connector
+            breakout c1-10g
+        exit
+        no shutdown
+        exit
+    port 1/1/c3
+        shutdown
+        connector
+            breakout c1-10g
+        exit
+        no shutdown
+        exit
+    port 1/1/c4 
+        shutdown
+        connector
+            breakout c1-10g
+        exit
+        no shutdown
+        exit
+#--------------------------------------------------
 echo "Port Configuration"
 #--------------------------------------------------
-    port 1/1/1
-        description "Connected_to_RR_EVPN_CTL"
+    port 1/1/c1/1
+        shutdown
         ethernet
+            mode hybrid
             encap-type dot1q
         exit
         no shutdown
-    exit
-    port 1/1/2
+        exit
+    port 1/1/c2/1
         shutdown
         ethernet
+            mode hybrid
+            encap-type dot1q
         exit
-    exit
-    port 1/1/3
+        no shutdown
+        exit
+    port 1/1/c3/1
         shutdown
         ethernet
+            mode hybrid
+            encap-type dot1q
         exit
-    exit
-    port 1/1/4
+        no shutdown
+        exit
+    port 1/1/c4/1
         shutdown
         ethernet
+            mode hybrid
+            encap-type dot1q
         exit
-    exit
-    port 1/1/5
-        shutdown
-        ethernet
+        no shutdown
         exit
-    exit
-    port 1/1/6
-        shutdown
-        ethernet
-        exit
-    exit
-    port 1/1/7
-        shutdown
-        ethernet
-        exit
-    exit
-    port 1/1/8
-        shutdown
-        ethernet
-        exit
-    exit
-    port 1/1/9
-        shutdown
-        ethernet
-        exit
-    exit
-    port 1/1/10
-        shutdown
-        ethernet
-        exit
-    exit
-    port 1/1/11
-        shutdown
-        ethernet
-        exit
-    exit
-    port 1/1/12
-        shutdown
-        ethernet
-        exit
-    exit
-    port 1/1/13
-        shutdown
-        ethernet
-        exit
-    exit
-    port 1/1/14
-        shutdown
-        ethernet
-        exit
-    exit
-    port 1/1/15
-        shutdown
-        ethernet
-        exit
-    exit
-    port 1/1/16
-        shutdown
-        ethernet
-        exit
-    exit
-    port 1/1/17
-        shutdown
-        ethernet
-        exit
-    exit
-    port 1/1/18
-        shutdown
-        ethernet
-        exit
-    exit
-    port 1/1/19
-        shutdown
-        ethernet
-        exit
-    exit
-    port 1/1/20
-        shutdown
-        ethernet
-        exit
-    exit
 #--------------------------------------------------
 echo "Management Router Configuration"
 #--------------------------------------------------
-    router management
-    exit
-
 #--------------------------------------------------
 echo "Router (Network Side) Configuration"
 #--------------------------------------------------
@@ -332,318 +120,24 @@ echo "Router (Network Side) Configuration"
             exit
             no shutdown
         exit
-        interface "to_RR_EVPN_CTL"
-            address {{ node.rr_evpn_ctl_ip }}/{{ common.rr_evpn_ctl_ip_prefix }}
-            port 1/1/1:0
-            icmp
-                no mask-reply
-                no redirects
-                no unreachables
-            exit
-            bfd 100 receive 100 multiplier 3
-            no shutdown
-        exit
         autonomous-system {{ common.asn }}
-        ecmp 64
 #--------------------------------------------------
 echo "Static Route Configuration"
 #--------------------------------------------------
-        static-route-entry 0.0.0.0/0
-            next-hop {{ common.rr_evpn_ctl_gateway }}
-                no shutdown
-            exit
-        exit
-    exit
-
 #--------------------------------------------------
 echo "Service Configuration"
 #--------------------------------------------------
-    service
-        customer 1 name "1" create
-            description "Default customer"
-        exit
-    exit
 #--------------------------------------------------
 echo "Router (Service Side) Configuration"
 #--------------------------------------------------
-    router Base
 #--------------------------------------------------
 echo "Policy Configuration"
 #--------------------------------------------------
-        policy-options
-            begin
-            community "VCS_Clients"
-                members "origin:65534:3"
-            exit
-            community "VNS_Clients"
-                members "origin:65534:2"
-            exit
-            community "DCGW_Clients"
-                members "origin:65534:1"
-            exit
-            policy-statement "TAG-VCS-EVPN-ROUTES"
-                entry 10
-                    from
-                        family evpn
-                    exit
-                    action accept
-                        tag 3
-                    exit
-                exit
-                default-action accept
-                exit
-            exit
-            policy-statement "TAG-VNS-EVPN-ROUTES"
-                entry 10
-                    from
-                        family evpn
-                    exit
-                    action accept
-                        community add "VNS_Clients"
-                    exit
-                exit
-                default-action accept
-                exit
-            exit
-            policy-statement "TAG-DCGW-EVPN-ROUTES"
-                entry 10
-                    from
-                        family evpn
-                    exit
-                    action accept
-                        community add "DCGW_Clients"
-                    exit
-                exit
-                default-action accept
-                exit
-            exit
-            policy-statement "REJECT-VNS-EVPN-ROUTES"
-                entry 10
-                    from
-                        community "VNS_Clients"
-                    exit
-                    action drop
-                    exit
-                exit
-                default-action accept
-                exit
-            exit
-            policy-statement "REJECT-VCS-DCGW-EVPN-ROUTES"
-                entry 10
-                    from
-                        community "VCS_Clients"
-                    exit
-                    action drop
-                    exit
-                exit
-                entry 20
-                    from
-                        community "DCGW_Clients"
-                    exit
-                    action drop
-                    exit
-                exit
-                entry 30
-                    from
-                        tag 3
-                    exit
-                    action drop
-                    exit
-                exit
-                default-action accept
-                exit
-            exit
-            policy-statement "REJECT-DCGW-VNS-rVCS-EVPN-ROUTES"
-                description "Reject VNS, remote VCS and other DCGW EVPN routes"
-                entry 10
-                    from
-                        community "DCGW_Clients"
-                    exit
-                    action drop
-                    exit
-                exit
-                entry 20
-                    from
-                        community "VCS_Clients"
-                    exit
-                    action drop
-                    exit
-                exit
-                entry 30
-                    from
-                        community "VNS_Clients"
-                    exit
-                    action drop
-                    exit
-                exit
-                default-action accept
-                exit
-            exit
-            policy-statement "ALLOW-VCS-REJECT-DCGW-EVPN-ROUTES"
-                entry 10
-                    from
-                        tag 3
-                    exit
-                    action accept
-                        community add "VCS_Clients"
-                    exit
-                exit
-                entry 20
-                    from
-                        community "DCGW_Clients"
-                    exit
-                    action drop
-                    exit
-                exit
-                default-action accept
-                exit
-            exit
-            commit
-        exit
 #--------------------------------------------------
 echo "BGP Configuration"
 #--------------------------------------------------
-        bgp
-            vpn-apply-import
-            vpn-apply-export
-            graceful-restart
-            exit
-            min-route-advertisement 1
-            router-id {{ node.system_ip }}
-            rapid-withdrawal
-            rapid-update evpn
-            group "RR_Peers"
-                family evpn
-                type internal
-                local-address {{ node.rr_evpn_ctl_ip }}
-                neighbor {{ node.rr_peers.remote_rr1_ip }}
-                    description "{{ node.rr_peers.remote_rr1_desc }}"
-                    export "ALLOW-VCS-REJECT-DCGW-EVPN-ROUTES"
-                    bfd-enable
-                exit
-                neighbor {{ node.rr_peers.remote_rr2_ip }}
-                    description "{{ node.rr_peers.remote_rr2_desc }}"
-                    export "ALLOW-VCS-REJECT-DCGW-EVPN-ROUTES"
-                    bfd-enable
-                exit
-                neighbor {{ node.rr_peers.local_rr_ip }}
-                    description "{{ node.rr_peers.local_rr_desc }}"
-                    bfd-enable
-                exit
-            exit
-            group "VCS_Clients"
-                family evpn
-                type internal
-                cluster {{ node.vcs_clients.cluster_id }}
-                import "TAG-VCS-EVPN-ROUTES"
-                export "REJECT-VNS-EVPN-ROUTES"
-                local-address {{ node.rr_evpn_ctl_ip }}
-                neighbor {{ node.vcs_clients.vsc1_ip }}
-                    description "{{ node.vcs_clients.vsc1_desc }}"
-                exit
-                neighbor {{ node.vcs_clients.vsc2_ip }}
-                    description "{{ node.vcs_clients.vsc2_desc }}"
-                exit
-            exit
-            group "VNS_Clients"
-                family evpn
-                type internal
-                cluster {{ node.vns_clients.cluster_id }}
-                import "TAG-VNS-EVPN-ROUTES"
-                export "REJECT-VCS-DCGW-EVPN-ROUTES"
-                local-address {{ node.rr_evpn_ctl_ip }}
-                neighbor {{ node.vns_clients.vsc1_ip }}
-                    description "{{ node.vns_clients.vsc1_desc }}"
-                exit
-                neighbor {{ node.vns_clients.vsc2_ip }}
-                    description "{{ node.vns_clients.vsc2_desc }}"
-                exit
-                neighbor {{ node.vns_clients.vsc3_ip }}
-                    description "{{ node.vns_clients.vsc3_desc }}"
-                exit
-                neighbor {{ node.vns_clients.vsc4_ip }}
-                    description "{{ node.vns_clients.vsc4_desc }}"
-                exit
-                neighbor {{ node.vns_clients.vsc5_ip }}
-                    description "{{ node.vns_clients.vsc5_desc }}"
-                exit
-                neighbor {{ node.vns_clients.vsc6_ip }}
-                    description "{{ node.vns_clients.vsc6_desc }}"
-                exit
-                neighbor {{ node.vns_clients.vsc7_ip }}
-                    description "{{ node.vns_clients.vsc7_desc }}"
-                exit
-                neighbor {{ node.vns_clients.vsc8_ip }}
-                    description "{{ node.vns_clients.vsc8_desc }}"
-                exit
-                neighbor {{ node.vns_clients.vsc9_ip }}
-                    description "{{ node.vns_clients.vsc9_desc }}"
-                exit
-                neighbor {{ node.vns_clients.vsc10_ip }}
-                    description "{{ node.vns_clients.vsc10_desc }}"
-                exit
-                neighbor {{ node.vns_clients.vsc11_ip }}
-                    description "{{ node.vns_clients.vsc11_desc }}"
-                exit
-                neighbor {{ node.vns_clients.vsc12_ip }}
-                    description "{{ node.vns_clients.vsc12_desc }}"
-                exit
-                neighbor {{ node.vns_clients.vsc13_ip }}
-                    description "{{ node.vns_clients.vsc13_desc }}"
-                exit
-                neighbor {{ node.vns_clients.vsc14_ip }}
-                    description "{{ node.vns_clients.vsc14_desc }}"
-                exit
-                neighbor {{ node.vns_clients.vsc15_ip }}
-                    description "{{ node.vns_clients.vsc15_desc }}"
-                exit
-                neighbor {{ node.vns_clients.vsc16_ip }}
-                    description "{{ node.vns_clients.vsc16_desc }}"
-                exit
-                neighbor {{ node.vns_clients.vsc17_ip }}
-                    description "{{ node.vns_clients.vsc17_desc }}"
-                exit
-                neighbor {{ node.vns_clients.vsc18_ip }}
-                    description "{{ node.vns_clients.vsc18_desc }}"
-                exit
-                neighbor {{ node.vns_clients.vsc19_ip }}
-                    description "{{ node.vns_clients.vsc19_desc }}"
-                exit
-                neighbor {{ node.vns_clients.vsc20_ip }}
-                    description "{{ node.vns_clients.vsc20_desc }}"
-                exit
-            exit
-            group "DCGW_Clients"
-                family evpn
-                type internal
-                cluster {{ node.system_ip }}
-                import "TAG-DCGW-EVPN-ROUTES"
-                export "REJECT-DCGW-VNS-rVCS-EVPN-ROUTES"
-                local-address {{ node.rr_evpn_ctl_ip }}
-                neighbor {{ node.dcgw_clients.dcgw1_ip }}
-                    description "{{ node.dcgw_clients.dcgw1_desc }}"
-                    bfd-enable
-                exit
-                neighbor {{ node.dcgw_clients.dcgw2_ip }}
-                    description "{{ node.dcgw_clients.dcgw2_desc }}"
-                    bfd-enable
-                exit
-            exit
-            no shutdown
-        exit
-    exit
-
 #--------------------------------------------------
 echo "System Time NTP Configuration"
 #--------------------------------------------------
-    system
-        time
-            ntp
-                server {{ common.ntp_server_1 }} prefer
-                server {{ common.ntp_server_2 }}
-            exit
-        exit
-    exit
 
 exit all
-

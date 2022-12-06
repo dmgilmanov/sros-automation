@@ -1,0 +1,11 @@
+---
+    mgmt_gateway: "192.168.2.1"
+    mgmt_ip_prefix: "24"
+    dns_server_1: "10.158.55.11"
+    dns_domain: "lab.local"
+    bof_persist: "on"
+    system_location: "TRK SBU EVE-NG"
+    ntp_server_1: "10.158.55.11"
+    time_zone: "GMT"
+    asn: "65500"
+...

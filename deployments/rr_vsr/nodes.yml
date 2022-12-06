@@ -1,0 +1,13 @@
+---
+evengRR1:
+    node_type: "rr_vsr"
+    system_name: "demoRR1"
+    mgmt_ip: "172.18.70.85"
+    system_ip: "21.21.21.21"
+
+# evengRR2:
+#     node_type: "vRR"
+#     system_name: "demoRR2"
+#     mgmt_ip: "172.18.70.85"
+#     system_ip: "2.2.2.2/32"
+...
